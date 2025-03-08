@@ -15,18 +15,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -646,11 +649,136 @@ fun FavouritesScreen(navController: NavHostController) {
 
 @Composable
 fun DetailsScreen(navController: NavHostController) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5DC))
+            .padding(16.dp)
     ) {
-        Text("Экран с детальной информацией")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { navController.popBackStack() }, // Кнопка возврата
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Назад",
+                    tint = Color.Black
+                )
+            }
+
+            Row {
+                IconButton(
+
+
+                    onClick = { /* Обработка избранного */ },
+                    modifier = Modifier.size(48.dp) // Увеличенный размер
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = "Избранное",
+                        tint = Color.Black
+                    )
+                }
+                IconButton(
+                    onClick = { /* Обработка поделиться */ },
+                    modifier = Modifier.size(48.dp) // Увеличенный размер
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Share,
+                        contentDescription = "Поделиться",
+                        tint = Color.Black
+                    )
+                }
+            }
+
+        }
+        Image(
+            painter = painterResource(id = R.drawable.sobaka),
+            contentDescription = "Собака",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
+
+
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = "Шарик",
+                fontSize = 24.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "Дворняга",
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "6 месяцев",
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "Кабель",
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = """"Приют "Добрые руки".""",
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+        }
+
+        // Панель с заголовком и текстом
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = Color(0XFFF6DCE7),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Описание",
+                fontSize = 18.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat..",
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+        }
+
+        // Кнопка "Написать в приют"
+        Button(
+            onClick = { navController.navigate("chat") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA6E0DE)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            shape = RoundedCornerShape(50.dp),
+
+            ) {
+            Text(
+                text = "Написать в приют",
+                color = Color.Black
+            )
+        }
     }
 }
 
