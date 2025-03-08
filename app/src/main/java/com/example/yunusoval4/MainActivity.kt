@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,20 +20,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +51,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,6 +60,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,6 +70,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 
 class MainActivity : ComponentActivity() {
@@ -785,11 +800,140 @@ fun DetailsScreen(navController: NavHostController) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChatScreen(navController: NavHostController) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+// Состояние для сообщений и ввода
+    var messageText by remember { mutableStateOf("") }
+    val messages = remember { mutableStateListOf(
+        Triple("Вы", "Добрый день! Объявление ещё актульно?", "10:00"),
+        Triple("Приют", "Добрый день, да.", "10:02")
+    ) }
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5DC))
     ) {
-        Text("Экран с чатом")
+        // Верхняя панель с фото и именем
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .background(Color(0xFFA6E0DE)) // Мятный цвет
+                .clickable { navController.popBackStack() } // Возврат на DetailsScreen
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Назад",
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(end = 8.dp)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.sobaka),
+                contentDescription = "Собака",
+                modifier = Modifier.size(48.dp) // Квадратное изображение
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Шарик",
+                fontSize = 20.sp,
+                color = Color.Black
+            )
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+        ) {
+            items(messages) { message ->
+                val (sender, text, time) = message
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = if (sender == "Вы") Arrangement.End else Arrangement.Start
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .widthIn(max = 300.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0XFFF6DCE7) // Розовый цвет
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text(
+                                text = text,
+                                fontSize = 14.sp,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = time,
+                                fontSize = 10.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.align(Alignment.End)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Поле ввода сообщения с кнопкой прикрепления
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = {  },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.AttachFile,
+                    contentDescription = "Прикрепить файл",
+                    tint = Color.Black
+                )
+            }
+            OutlinedTextField(
+                value = messageText,
+                onValueChange = { messageText = it },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                placeholder = { Text("Введите сообщение") },
+                shape = RoundedCornerShape(24.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text, // Поддержка текста на любом языке
+                    imeAction = ImeAction.Send // Кнопка "Отправить" на клавиатуре
+
+                ),
+
+                )
+            IconButton(
+                onClick = {
+                    if (messageText.isNotBlank()) {
+                        val currentTime = LocalTime.now().format(timeFormatter)
+                        messages.add(Triple("Вы", messageText, currentTime))
+                        messageText = "" // Очистка поля после отправки
+                    }
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Send,
+                    contentDescription = "Отправить",
+                    tint = Color.Black
+                )
+            }
+        }
     }
 }
 
