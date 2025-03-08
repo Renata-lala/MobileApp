@@ -18,10 +18,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.PersonOutline
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -43,6 +54,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -220,10 +232,228 @@ fun LoginScreen(navController: NavHostController) {
 @Composable
 fun AnnouncementsScreen( navController: NavHostController) {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5DC))
     ) {
-        Text("Экран объявлений")
+        // Основной контент
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Поле поиска
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Поиск") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(50.dp)
+            )
+
+            // Кнопки с иконками
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(
+                    onClick = { /* Обработка сортировки */ },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            color = Color(0xFFA6E0DE),
+                            shape = RoundedCornerShape(90.dp)
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.FilterAlt,
+                        contentDescription = "Сортировка",
+                        tint = Color.Black
+                    )
+                }
+                IconButton(
+                    onClick = { /* Обработка фильтров */ },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            color = Color(0xFFA6E0DE),
+                            shape = RoundedCornerShape(90.dp)
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Tune,
+                        contentDescription = "Фильтры",
+                        tint = Color.Black
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                repeat(4) { index ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color(0XFFF6DCE7),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(end = 16.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.sobaka),
+                                    contentDescription = "Собака",
+                                    modifier = Modifier.size(80.dp)
+                                )
+                                Text(
+                                    text = "22.02.2025",
+                                    color = Color.Gray,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Шарик",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Дворняга",
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Кабель",
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = """"Приют "Добрые руки".""",
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Подробнее",
+                                    color = Color.Black,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier
+                                        .align(Alignment.End)
+                                        .padding(top = 8.dp)
+                                        .clickable { navController.navigate("details") } // Переход на экран "details"
+                                )
+                            }
+                        }
+
+                        IconButton(
+                            onClick = { /* Обработка добавления в избранное */ },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.FavoriteBorder,
+                                contentDescription = "Добавить в избранное",
+                                tint = Color.Black
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = Color(0xFFFFC1CC), // Розовый цвет
+                    shape = RoundedCornerShape(16.dp) // Закругление по всем углам
+                )
+                .padding(16.dp)
+                .align(Alignment.BottomCenter), // Исправлено на Modifier.align
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            // Кнопка текущего экрана - серая
+            IconButton(
+                onClick = { /* Уже на этом экране */ },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color.Gray,
+                        shape = RoundedCornerShape(12.dp) // Подушка
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Объявления",
+                    tint = Color.Black
+                )
+            }
+
+            // Остальные кнопки - розовые
+            IconButton(
+                onClick = { navController.navigate("favourites") },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color(0xFFFFC1CC), // Розовый базовый цвет
+                        shape = RoundedCornerShape(12.dp) // Подушка
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "Избранное",
+                    tint = Color.Black
+                )
+            }
+            IconButton(
+                onClick = { /* Переход на другой экран */ },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color(0xFFFFC1CC), // Розовый базовый цвет
+                        shape = RoundedCornerShape(12.dp) // Подушка
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ChatBubbleOutline,
+                    contentDescription = "Настройки",
+                    tint = Color.Black
+                )
+            }
+            IconButton(
+                onClick = { /* Переход на другой экран */ },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color(0xFFFFC1CC), // Розовый базовый цвет
+                        shape = RoundedCornerShape(12.dp) // Подушка
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PersonOutline,
+                    contentDescription = "Домой",
+                    tint = Color.Black
+                )
+            }
+        }
     }
 }
 
