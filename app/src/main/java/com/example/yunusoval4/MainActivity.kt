@@ -460,10 +460,187 @@ fun AnnouncementsScreen( navController: NavHostController) {
 @Composable
 fun FavouritesScreen(navController: NavHostController) {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5DC))
     ) {
-        Text("Экран c избранными")
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Избранное",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFFFC1CC),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                repeat(2) { index ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color(0xFFA6E0DE),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(end = 16.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.sobaka),
+                                    contentDescription = "Собака",
+                                    modifier = Modifier.size(80.dp)
+                                )
+                                Text(
+                                    text = "22.02.2025",
+                                    color = Color.Gray,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Шарик",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Дворняга",
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Кабель",
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = """"Приют "Добрые руки".""",
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Подробнее",
+                                    color = Color.Black,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier
+                                        .align(Alignment.End)
+                                        .padding(top = 8.dp)
+                                        .clickable { navController.navigate("details") }
+                                )
+                            }
+                        }
+
+                        // Кнопка-иконка в правом верхнем углу
+                        IconButton(
+                            onClick = {  },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.FavoriteBorder,
+                                contentDescription = "Любимое",
+                                tint = Color.Black
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = Color(0xFFFFC1CC),
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(16.dp)
+                .align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconButton(
+                onClick = { navController.navigate("announcements") },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color(0xFFFFC1CC),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Объявления",
+                    tint = Color.Black
+                )
+            }
+
+            IconButton(
+                onClick = { /* Уже на этом экране */ },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color.Gray,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "Избранное",
+                    tint = Color.Black
+                )
+            }
+
+            IconButton(
+                onClick = { /* Переход на другой экран */ },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color(0xFFFFC1CC),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ChatBubbleOutline,
+                    contentDescription = "Чат",
+                    tint = Color.Black
+                )
+            }
+            IconButton(
+                onClick = { /* Переход на другой экран */ },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color(0xFFFFC1CC),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PersonOutline,
+                    contentDescription = "Профиль",
+                    tint = Color.Black
+                )
+            }
+        }
     }
 }
 
