@@ -2,6 +2,8 @@ package com.example.yunusoval4
 
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -44,6 +46,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -66,12 +69,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.LocalTime as LocalTime1
 
 
 class MainActivity : ComponentActivity() {
@@ -94,12 +98,90 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Composable
-fun LoginScreen(navController: NavHostController) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var rememberMe by remember { mutableStateOf(false) }
+// Модель состояния UI для LoginScreen
+data class LoginUiState(
+    val email: String = "",
+    val password: String = "",
+    val rememberMe: Boolean = false,
+    val emailError: String? = null,
+    val passwordError: String? = null,
+    val isLoading: Boolean = false,
+    val loginSuccess: Boolean = false
+)
 
+// ViewModel для LoginScreen
+class LoginViewModel() : ViewModel(), Parcelable {
+    var uiState by mutableStateOf(LoginUiState())
+        private set
+
+    constructor(parcel: Parcel) : this() {
+    }
+
+    fun updateEmail(newEmail: String) {
+        uiState = uiState.copy(email = newEmail, emailError = validateEmail(newEmail))
+    }
+
+    fun updatePassword(newPassword: String) {
+        uiState = uiState.copy(password = newPassword, passwordError = validatePassword(newPassword))
+    }
+
+    fun updateRememberMe(newValue: Boolean) {
+        uiState = uiState.copy(rememberMe = newValue)
+    }
+
+    fun login(onLoginSuccess: () -> Unit) {
+        val emailValid = validateEmail(uiState.email)
+        val passwordValid = validatePassword(uiState.password)
+
+        uiState = uiState.copy(
+            emailError = emailValid,
+            passwordError = passwordValid,
+            isLoading = true
+        )
+
+        if (emailValid == null && passwordValid == null) {
+            uiState = uiState.copy(isLoading = false, loginSuccess = true)
+            onLoginSuccess()
+        } else {
+            uiState = uiState.copy(isLoading = false)
+        }
+    }
+
+    private fun validateEmail(email: String): String? {
+        return if (email.isBlank()) "Поле не может быть пустым"
+        else if (!email.contains("@") || !email.contains(".")) "Неверный формат email"
+        else null
+    }
+
+    private fun validatePassword(password: String): String? {
+        return if (password.isBlank()) "Поле не может быть пустым"
+        else if (password.length < 6) "Пароль должен быть не менее 6 символов"
+        else null
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<LoginViewModel> {
+        override fun createFromParcel(parcel: Parcel): LoginViewModel {
+            return LoginViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<LoginViewModel?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
+
+
+@Composable
+fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+    val uiState = viewModel.uiState
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -176,27 +258,30 @@ fun LoginScreen(navController: NavHostController) {
             )
             // Поле ввода email
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = uiState.email,
+                onValueChange = { viewModel.updateEmail(it) },
                 label = { Text("Электронная почта") },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
-                shape = RoundedCornerShape(50.dp) // Овальная форма
+                shape = RoundedCornerShape(50.dp), // Овальная форма
+                supportingText = { if (uiState.emailError != null) Text(uiState.emailError!!) }
             )
 
             // Поле ввода пароля
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = uiState.password,
+                onValueChange = { viewModel.updatePassword(it) },
                 label = { Text("Пароль") },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
                 shape = RoundedCornerShape(50.dp), // Овальная форма
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                isError = uiState.passwordError != null,
+                supportingText = { if (uiState.passwordError != null) Text(uiState.passwordError!!)}
             )
 
             // Ряд с Checkbox и "Забыли пароль"
@@ -209,8 +294,8 @@ fun LoginScreen(navController: NavHostController) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = rememberMe,
-                        onCheckedChange = { rememberMe = it }
+                        checked = uiState.rememberMe,
+                        onCheckedChange = { viewModel.updateRememberMe(it) }
                     )
                     Text(
                         text = "Запомнить меня",
@@ -225,14 +310,19 @@ fun LoginScreen(navController: NavHostController) {
 
             // Кнопка "Вход"
             Button(
-                onClick = { navController.navigate("announcements") },
+                onClick = { viewModel.login { navController.navigate("announcements") } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC1CC))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC1CC)),
+                enabled = !uiState.isLoading
             ) {
-                Text("Вход")
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                } else {
+                    Text("Вход")
+                }
             }
 
             // Ссылка "Нет аккаунта"
@@ -920,7 +1010,7 @@ fun ChatScreen(navController: NavHostController) {
             IconButton(
                 onClick = {
                     if (messageText.isNotBlank()) {
-                        val currentTime = LocalTime.now().format(timeFormatter)
+                        val currentTime = LocalTime1.now().format(timeFormatter)
                         messages.add(Triple("Вы", messageText, currentTime))
                         messageText = "" // Очистка поля после отправки
                     }
